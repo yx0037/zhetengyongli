@@ -139,3 +139,40 @@ hr {
 	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
 	white-space: nowrap;
 }
+
+/* 浅 / 暗色切换：用 data-theme 控制 */
+:root {
+	--header-bg: #fff;
+	--card-bg: #fff;
+	--card-border: rgb(var(--gray-light));
+	color-scheme: light;
+}
+:root[data-theme='dark'] {
+	--accent: #8ab4ff;
+	--accent-dark: #c3d0ff;
+	--black: 240, 242, 245;
+	--gray: 160, 175, 200;
+	--gray-light: 51, 65, 85;
+	--gray-dark: 226, 232, 240;
+	--gray-gradient: rgba(15, 23, 42, 50%), #0f172a;
+	--box-shadow:
+		0 2px 6px rgba(0, 0, 0, 40%), 0 8px 24px rgba(0, 0, 0, 35%),
+		0 16px 32px rgba(0, 0, 0, 30%);
+	--header-bg: #0f172a;
+	--card-bg: #1e293b;
+	--card-border: #334155;
+	color-scheme: dark;
+}
+:root[data-theme='dark'] body {
+	background: #0f172a;
+	color: rgb(var(--gray-dark));
+}
+:root[data-theme='dark'] code {
+	background-color: #334155;
+}
+:root[data-theme='dark'] pre {
+	background-color: #1e293b;
+}
+:root[data-theme='dark'] img {
+	opacity: 0.92;
+}
