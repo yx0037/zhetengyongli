@@ -1,0 +1,58 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import Header from '../../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+
+const items = (await getCollection('daily')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+const cats = ['AI', '科技', '智能家居'] as const;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={`每日资讯 | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<style>
+			main { width: 960px; max-width: calc(100% - 2em); margin: auto; padding: 2em 1em; }
+			.cats { display: flex; gap: 0.75rem; margin: 1rem 0 2rem; flex-wrap: wrap; }
+			.cats a { border: 1px solid rgb(var(--gray-light)); border-radius: 999px; padding: 0.35rem 0.9rem; text-decoration: none; color: rgb(var(--black)); }
+			.cats a.active { background: rgb(var(--black)); color: #fff; }
+			ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1.25rem; }
+			li { border: 1px solid rgb(var(--gray-light)); border-radius: 12px; padding: 1rem 1.25rem; }
+			li a { text-decoration: none; }
+			.tag { display: inline-block; font-size: 0.85em; border-radius: 999px; padding: 0.1rem 0.6rem; background: rgb(var(--gray-light)); margin-right: 0.5rem; }
+			.date { color: rgb(var(--gray)); margin: 0.25rem 0; }
+			.desc { margin: 0.5rem 0 0; }
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1>每日资讯</h1>
+			<p>智能家居、科技、AI，每天 3 条短资讯。每个用例库的深度内容在 <a href="/cases/">用例库</a>。</p>
+			<div class="cats">
+				<a href="/daily/" class="active">全部</a>
+				<a href="/daily/category/AI/">AI</a>
+				<a href="/daily/category/科技/">科技</a>
+				<a href="/daily/category/智能家居/">智能家居</a>
+			</div>
+			<ul>
+				{items.map((item) => (
+					<li>
+						<a href={`/daily/${item.id}/`}>
+							<span class="tag">{item.data.category}</span>
+							<strong>{item.data.title}</strong>
+							<p class="date"><FormattedDate date={item.data.pubDate} /></p>
+							<p class="desc">{item.data.description}</p>
+						</a>
+					</li>
+				))}
+			</ul>
+		</main>
+		<Footer />
+	</body>
+</html>
