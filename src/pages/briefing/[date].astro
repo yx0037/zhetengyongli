@@ -6,8 +6,8 @@ import FormattedDate from '../../components/FormattedDate.astro';
 import Header from '../../components/Header.astro';
 
 const SECTION_META = [
-	{ key: 'global', name: '全球热榜', emoji: '🌍' },
-	{ key: 'us', name: '美国热榜', emoji: '🇺🇸' },
+	{ key: 'global', name: '全球新闻', emoji: '🌍' },
+	{ key: 'us', name: '美国新闻', emoji: '🇺🇸' },
 	{ key: 'tech', name: '科技', emoji: '💻' },
 	{ key: 'ai', name: 'AI', emoji: '🤖' },
 ] as const;
@@ -56,9 +56,9 @@ const sections = await Promise.all(
 			<h1>{title}</h1>
 			<p class="date"><FormattedDate date={pubDate} /></p>
 			<p>
-				本期简报四栏各 10 条。热榜名次为当日下午（北京时间）抓取的 X 趋势快照；
+				本期简报四栏各 10 条。全球与美国两栏为综合 X 热议话题与当日主流媒体头条整理的新闻；
 				科技与 AI 两栏为编辑筛选，以当日动态为主，少数本月大事会标明日期。
-				也可以按栏目看：<a href="/global/">全球热榜</a> · <a href="/us/">美国热榜</a> ·
+				也可以按栏目看：<a href="/global/">全球新闻</a> · <a href="/us/">美国新闻</a> ·
 				<a href="/tech/">科技</a> · <a href="/ai/">AI</a>。
 			</p>
 			{sections.map((s) => s && (
@@ -68,7 +68,7 @@ const sections = await Promise.all(
 				</section>
 			))}
 			<p class="src">
-				<strong>数据来源</strong>：全球 / 美国热榜来自 X 公开趋势数据（经 trends.cyberkendra.com 整理，约每 30 分钟更新）；
+				<strong>数据来源</strong>：全球 / 美国新闻为编辑综合 X 平台热议话题与当日主流媒体头条筛选；
 				科技与 AI 栏目为编辑筛选，来源已逐条标注。
 			</p>
 		</main>
