@@ -6,8 +6,9 @@ import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
-const daily = (await getCollection('daily')).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()).slice(0, 3);
-const cases = (await getCollection('cases')).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()).slice(0, 3);
+const briefings = (await getCollection('briefing')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
 ---
 
 <!doctype html>
@@ -16,31 +17,42 @@ const cases = (await getCollection('cases')).sort((a, b) => b.data.pubDate.value
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 		<style>
 			main { width: 960px; max-width: calc(100% - 2em); margin: auto; padding: 2em 1em; }
-			.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem; }
-			@media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
-			.card { border: 1px solid rgb(var(--gray-light)); border-radius: 12px; padding: 1rem 1.25rem; }
-			.card ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.9rem; }
-			.card li a { text-decoration: none; }
-			.tag { display: inline-block; font-size: 0.85em; border-radius: 999px; padding: 0.1rem 0.6rem; background: rgb(var(--gray-light)); margin-right: 0.5rem; }
-			.date { color: rgb(var(--gray)); margin: 0.2rem 0; font-size: 0.9em; }
+			.cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 1.5rem 0 2.5rem; }
+			@media (max-width: 720px) { .cols { grid-template-columns: 1fr 1fr; } }
+			.col { border: 1px solid rgb(var(--gray-light)); border-radius: 12px; padding: 0.9rem 1.1rem; }
+			.col h3 { margin: 0 0 0.4rem; }
+			.col p { margin: 0; font-size: 0.92em; }
+			ul.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1.25rem; }
+			ul.list li { border: 1px solid rgb(var(--gray-light)); border-radius: 12px; padding: 1rem 1.25rem; }
+			ul.list li a { text-decoration: none; }
+			.date { color: rgb(var(--gray)); margin: 0.25rem 0; }
+			.desc { margin: 0.5rem 0 0; }
 		</style>
 	</head>
 	<body>
 		<Header />
 		<main>
-			<h1>折腾用例库</h1>
+			<h1>X 每日简报</h1>
 			<p>{SITE_DESCRIPTION}</p>
-			<p><a href="/cases/">进入用例库 →</a> &nbsp; <a href="/daily/">进入每日资讯 →</a></p>
-			<div class="grid">
-				<section class="card">
-					<h2>最新用例</h2>
-					{ cases.length === 0 ? <p>用例库还在整理中，第一批即将发布。</p> : <ul>{cases.map((c) => (<li><a href={`/cases/${c.id}/`}><span class="tag">{c.data.category}</span><strong>{c.data.title}</strong><p class="date"><FormattedDate date={c.data.pubDate} /></p></a></li>))}</ul> }
-				</section>
-				<section class="card">
-					<h2>今日资讯</h2>
-					<ul>{daily.map((d) => (<li><a href={`/daily/${d.id}/`}><span class="tag">{d.data.category}</span><strong>{d.data.title}</strong><p class="date"><FormattedDate date={d.data.pubDate} /></p></a></li>))}</ul>
-				</section>
+			<div class="cols">
+				<div class="col"><h3>🌍 全球热榜</h3><p>X 全球趋势 Top 10，附中文背景注。</p></div>
+				<div class="col"><h3>🇺🇸 美国热榜</h3><p>X 美国趋势 Top 10，附中文背景注。</p></div>
+				<div class="col"><h3>💻 科技</h3><p>当日科技圈热议话题，编辑筛选。</p></div>
+				<div class="col"><h3>🤖 AI</h3><p>当日 AI 圈热议话题，编辑筛选。</p></div>
 			</div>
+			<h2>最新简报</h2>
+			<ul class="list">
+				{briefings.map((item) => (
+					<li>
+						<a href={`/briefing/${item.id}/`}>
+							<strong>{item.data.title}</strong>
+							<p class="date"><FormattedDate date={item.data.pubDate} /></p>
+							<p class="desc">{item.data.description}</p>
+						</a>
+					</li>
+				))}
+			</ul>
+			<p style="margin-top:2rem"><a href="/briefing/">查看全部简报 →</a></p>
 		</main>
 		<Footer />
 	</body>
