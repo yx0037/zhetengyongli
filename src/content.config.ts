@@ -8,6 +8,9 @@ const briefing = defineCollection({
 		title: z.string(),
 		description: z.string(),
 		pubDate: z.coerce.date(),
+		section: z.enum(['global', 'us', 'tech', 'ai']),
+		issueTitle: z.string().optional(),
+		issueDescription: z.string().optional(),
 	}),
 });
 

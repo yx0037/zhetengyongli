@@ -6,9 +6,24 @@ import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
-const briefings = (await getCollection('briefing')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
+const all = await getCollection('briefing');
+const byDate = new Map<string, typeof all>();
+for (const e of all) {
+	const d = e.data.pubDate.toISOString().slice(0, 10);
+	if (!byDate.has(d)) byDate.set(d, []);
+	byDate.get(d)!.push(e);
+}
+const issues = [...byDate.entries()]
+	.sort((a, b) => b[0].localeCompare(a[0]))
+	.slice(0, 7)
+	.map(([date, entries]) => ({
+		date,
+		pubDate: entries[0].data.pubDate,
+		title: entries.find((e) => e.data.issueTitle)?.data.issueTitle ?? `X 每日简报 · ${date}`,
+		description:
+			entries.find((e) => e.data.issueDescription)?.data.issueDescription ??
+			entries.map((e) => e.data.description).join(' '),
+	}));
 ---
 
 <!doctype html>
@@ -19,7 +34,8 @@ const briefings = (await getCollection('briefing')).sort(
 			main { width: 960px; max-width: calc(100% - 2em); margin: auto; padding: 2em 1em; }
 			.cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 1.5rem 0 2.5rem; }
 			@media (max-width: 720px) { .cols { grid-template-columns: 1fr 1fr; } }
-			.col { border: 1px solid rgb(var(--gray-light)); border-radius: 12px; padding: 0.9rem 1.1rem; }
+			.col { display: block; border: 1px solid rgb(var(--gray-light)); border-radius: 12px; padding: 0.9rem 1.1rem; text-decoration: none; color: inherit; }
+			.col:hover { border-color: var(--accent); }
 			.col h3 { margin: 0 0 0.4rem; }
 			.col p { margin: 0; font-size: 0.92em; }
 			ul.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1.25rem; }
@@ -35,19 +51,19 @@ const briefings = (await getCollection('briefing')).sort(
 			<h1>X 每日简报</h1>
 			<p>{SITE_DESCRIPTION}</p>
 			<div class="cols">
-				<div class="col"><h3>🌍 全球热榜</h3><p>X 全球趋势 Top 10，附中文背景注。</p></div>
-				<div class="col"><h3>🇺🇸 美国热榜</h3><p>X 美国趋势 Top 10，附中文背景注。</p></div>
-				<div class="col"><h3>💻 科技</h3><p>当日科技圈热议话题，编辑筛选。</p></div>
-				<div class="col"><h3>🤖 AI</h3><p>当日 AI 圈热议话题，编辑筛选。</p></div>
+				<a class="col" href="/global/"><h3>🌍 全球热榜</h3><p>X 全球趋势 Top 10，附中文背景注。点击查看全部 →</p></a>
+				<a class="col" href="/us/"><h3>🇺🇸 美国热榜</h3><p>X 美国趋势 Top 10，附中文背景注。点击查看全部 →</p></a>
+				<a class="col" href="/tech/"><h3>💻 科技</h3><p>当日科技圈热议话题 10 条。点击查看全部 →</p></a>
+				<a class="col" href="/ai/"><h3>🤖 AI</h3><p>当日 AI 圈热议话题 10 条。点击查看全部 →</p></a>
 			</div>
 			<h2>最新简报</h2>
 			<ul class="list">
-				{briefings.map((item) => (
+				{issues.map((item) => (
 					<li>
-						<a href={`/briefing/${item.id}/`}>
-							<strong>{item.data.title}</strong>
-							<p class="date"><FormattedDate date={item.data.pubDate} /></p>
-							<p class="desc">{item.data.description}</p>
+						<a href={`/briefing/${item.date}/`}>
+							<strong>{item.title}</strong>
+							<p class="date"><FormattedDate date={item.pubDate} /></p>
+							<p class="desc">{item.description}</p>
 						</a>
 					</li>
 				))}

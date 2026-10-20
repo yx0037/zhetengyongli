@@ -6,9 +6,23 @@ import FormattedDate from '../../components/FormattedDate.astro';
 import Header from '../../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
 
-const items = (await getCollection('briefing')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
+const all = await getCollection('briefing');
+const byDate = new Map<string, typeof all>();
+for (const e of all) {
+	const d = e.data.pubDate.toISOString().slice(0, 10);
+	if (!byDate.has(d)) byDate.set(d, []);
+	byDate.get(d)!.push(e);
+}
+const issues = [...byDate.entries()]
+	.sort((a, b) => b[0].localeCompare(a[0]))
+	.map(([date, entries]) => ({
+		date,
+		pubDate: entries[0].data.pubDate,
+		title: entries.find((e) => e.data.issueTitle)?.data.issueTitle ?? `X 每日简报 · ${date}`,
+		description:
+			entries.find((e) => e.data.issueDescription)?.data.issueDescription ??
+			entries.map((e) => e.data.description).join(' '),
+	}));
 ---
 
 <!doctype html>
@@ -28,14 +42,18 @@ const items = (await getCollection('briefing')).sort(
 		<Header />
 		<main>
 			<h1>每日简报</h1>
-			<p>每天一期：X 全球热榜、美国热榜 Top 10（附中文背景注），加上科技与 AI 两栏编辑筛选的热议话题。</p>
+			<p>
+				每天一期，四栏各 10 条。也可以按栏目看：
+				<a href="/global/">🌍 全球热榜</a> · <a href="/us/">🇺🇸 美国热榜</a> ·
+				<a href="/tech/">💻 科技</a> · <a href="/ai/">🤖 AI</a>
+			</p>
 			<ul>
-				{items.map((item) => (
+				{issues.map((item) => (
 					<li>
-						<a href={`/briefing/${item.id}/`}>
-							<strong>{item.data.title}</strong>
-							<p class="date"><FormattedDate date={item.data.pubDate} /></p>
-							<p class="desc">{item.data.description}</p>
+						<a href={`/briefing/${item.date}/`}>
+							<strong>{item.title}</strong>
+							<p class="date"><FormattedDate date={item.pubDate} /></p>
+							<p class="desc">{item.description}</p>
 						</a>
 					</li>
 				))}
